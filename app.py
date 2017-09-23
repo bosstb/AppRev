@@ -31,36 +31,13 @@ class TokenRecord(leancloud.Object):
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    # 获取IP
-    #print request.headers['x-real-ip']
-    headers = request.headers
-    ip = request.headers['x-real-ip']
-    #ip =  request.access_route[-1]
-    # if request.headers.getlist("X-Forwarded-For"):
-    #     ip = request.headers.getlist("X-Forwarded-For")[0]
-    # else:
-    #     ip = request.remote_addr
-    # if str(ip).find(',') > 0:
-    #     ip = str(ip).split(',')[0]
-    #UA格式化，取系统类型、版本，语言，平台，版本，手机型号作对比
-    uas = request.user_agent
-    ua = str(uas.__getattribute__('platform'))
-    uas = str(uas).split(")", 1)
-    sys_type = uas[0].split(";")
-    for item in sys_type:
-        if item.find("ndroid") > 0:
-            ua = ua + item
-            break
-    ss = sys_type[-1].split('-')
-    ua = ua + ss[-1]
-
     tokenRecord = TokenRecord()
     if request.method == "GET":
         # args = request.args
         # affiliate = args.get('type')
         #查询未取到数据的包名。
         query = leancloud.Query(TokenRecord)
-        query.equal_to('devkey', None)
+        query.equal_to('ifgettoken', None)
         query_list = query.find()
         package = query_list[0].get('package')
         return package
@@ -86,6 +63,8 @@ def index():
             tokenRecord.save()
             return "OK"
         else:
+            tokenRecord.set('ifgettoken', "cantget")
+            tokenRecord.save()
             return "Where is the token?"
 
 
