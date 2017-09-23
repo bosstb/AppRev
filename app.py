@@ -39,8 +39,11 @@ def index():
         query = leancloud.Query(TokenRecord)
         query.equal_to('ifgettoken', None)
         query_list = query.find()
-        package = query_list[0].get('package')
-        return package
+        package = []
+        for i in range(0, 10):
+            if query_list[i]:
+                package.append(query_list[i].get('package'))
+        return json.dumps(package)
     else:
         args = request.args
         devkey = args.get('devkey')
