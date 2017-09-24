@@ -45,7 +45,10 @@ def index():
                 package.append(query_list[i].get('package'))
         return json.dumps(package)
     else:
-        args = request.args
+        if request.content_type == "text/plain;charset=UTF-8":
+            args = json.loads(request.get_data())
+        else:
+            args = request.form
         devkey = args.get('devkey')
         platform = args.get('platform')
         versionname = args.get('versionname')
