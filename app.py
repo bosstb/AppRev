@@ -45,7 +45,7 @@ def index():
                 package.append(query_list[i].get('package'))
         return json.dumps(package)
     else:
-        if request.content_type == "text/plain;charset=UTF-8":
+        if request.content_type == "application/json":
             args = json.loads(request.get_data())
         else:
             args = request.form
