@@ -45,6 +45,9 @@ def index():
                 package.append(query_list[i].get('package'))
         return json.dumps(package)
     else:
+        print request.content_type
+        print request.form
+
         if request.content_type == "application/json":
             args = json.loads(request.get_data())
         else:
