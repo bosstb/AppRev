@@ -61,30 +61,37 @@ def index():
         flykey = args.get('flykey')
         versioncode = args.get('versioncode')
         key = args.get("key")
+        if key:
+            query = leancloud.Query(TokenRecord)
+            query.equal_to('package', key)
+            query_list = query.find()
+            tokenRecord = None
+            if query_list:
+                objId = query_list[0].get("objectId")
+                Todo = leancloud.Object.extend('TokenRecord')
+                tokenRecord = Todo.create_without_data(objId)
+            else:
+                tokenRecord = TokenRecord()
 
-        query = leancloud.Query(TokenRecord)
-        query.equal_to('package', key)
-        query_list = query.find()
-        objId = query_list[0].get("objectId")
-        Todo = leancloud.Object.extend('TokenRecord')
-        tokenRecord = Todo.create_without_data(objId)
-        # 这里修改 location 的值
-        if devkey:
-            tokenRecord.set('devkey', devkey)
-            tokenRecord.set('platform', platform)
-            tokenRecord.set('versionname', versionname)
-            tokenRecord.set('event', event)
-            tokenRecord.set('data', data)
-            tokenRecord.set('adver', adver)
-            tokenRecord.set('flykey', flykey)
-            tokenRecord.set('versioncode', versioncode)
-            tokenRecord.set('ifgettoken', "done")
-            tokenRecord.save()
-            return "OK"
+            # 这里修改 location 的值
+            if devkey:
+                tokenRecord.set('devkey', devkey)
+                tokenRecord.set('platform', platform)
+                tokenRecord.set('versionname', versionname)
+                tokenRecord.set('event', event)
+                tokenRecord.set('data', data)
+                tokenRecord.set('adver', adver)
+                tokenRecord.set('flykey', flykey)
+                tokenRecord.set('versioncode', versioncode)
+                tokenRecord.set('ifgettoken', "done")
+                tokenRecord.save()
+                return "OK"
+            else:
+                tokenRecord.set('ifgettoken', "cantget")
+                tokenRecord.save()
+                return "Where is the token?"
         else:
-            tokenRecord.set('ifgettoken', "cantget")
-            tokenRecord.save()
-            return "Where is the token?"
+            return "Missing package!"
 
 
 @app.route('/time')
