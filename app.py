@@ -72,24 +72,20 @@ def index():
                 tokenRecord = Todo.create_without_data(objId)
             else:
                 tokenRecord = TokenRecord()
+                tokenRecord.set('package', key)
 
             # 这里修改 location 的值
-            if devkey:
-                tokenRecord.set('devkey', devkey)
-                tokenRecord.set('platform', platform)
-                tokenRecord.set('versionname', versionname)
-                tokenRecord.set('event', event)
-                tokenRecord.set('data', data)
-                tokenRecord.set('adver', adver)
-                tokenRecord.set('flykey', flykey)
-                tokenRecord.set('versioncode', versioncode)
-                tokenRecord.set('ifgettoken', "done")
-                tokenRecord.save()
-                return "OK"
-            else:
-                tokenRecord.set('ifgettoken', "cantget")
-                tokenRecord.save()
-                return "Where is the token?"
+            tokenRecord.set('devkey', devkey)
+            tokenRecord.set('platform', platform)
+            tokenRecord.set('versionname', versionname)
+            tokenRecord.set('event', event)
+            tokenRecord.set('data', data)
+            tokenRecord.set('adver', adver)
+            tokenRecord.set('flykey', flykey)
+            tokenRecord.set('versioncode', versioncode)
+            tokenRecord.set('ifgettoken', "done")
+            tokenRecord.save()
+            return "data save success"
         else:
             return "Missing package!"
 
