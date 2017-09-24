@@ -31,7 +31,7 @@ class TokenRecord(leancloud.Object):
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    tokenRecord = TokenRecord()
+    # tokenRecord = TokenRecord()
     if request.method == "GET":
         # args = request.args
         # affiliate = args.get('type')
@@ -54,6 +54,15 @@ def index():
         adver = args.get('adver')
         flykey = args.get('flykey')
         versioncode = args.get('versioncode')
+        key = args.get("key")
+
+        query = leancloud.Query(TokenRecord)
+        query.equal_to('package', key)
+        query_list = query.find()
+        objId = query_list[0].get("objectId")
+        Todo = leancloud.Object.extend('TokenRecord')
+        tokenRecord = Todo.create_without_data(objId)
+        # 这里修改 location 的值
         if devkey:
             tokenRecord.set('devkey', devkey)
             tokenRecord.set('platform', platform)
