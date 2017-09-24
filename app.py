@@ -75,6 +75,7 @@ def index():
             tokenRecord.set('adver', adver)
             tokenRecord.set('flykey', flykey)
             tokenRecord.set('versioncode', versioncode)
+            tokenRecord.set('ifgettoken', "done")
             tokenRecord.save()
             return "OK"
         else:
