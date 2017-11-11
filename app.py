@@ -14,20 +14,21 @@ from flask import request
 import leancloud
 import requests
 
-leancloud.init("h3m2DYtw3OcFUL3XDYeswQTS-gzGzoHsz", "GXxGFssDeCzf8TYXDoFps6P0")
+leancloud.init("F0zcG7tAkkjRJgbpMMIasYvy-MdYXbMMI", "gtrh1RJ5W1UNHejuS9V71pJy")
 
 
-clickList = {}
-clickListIsInit = False
 app = Flask(__name__)
 sockets = Sockets(app)
 # 动态路由
 app.register_blueprint(todos_view, url_prefix='/todos')
 
 
-class TokenRecord(leancloud.Object):
+class token_record(leancloud.Object):
     pass
 
+
+class Token_CR(leancloud.Object):
+    pass
 
 @app.route('/', methods=["GET", "POST"])
 def index():
@@ -36,7 +37,7 @@ def index():
         # args = request.args
         # affiliate = args.get('type')
         #查询未取到数据的包名。
-        query = leancloud.Query(TokenRecord)
+        query = leancloud.Query(token_record)
         query.equal_to('ifgettoken', None)
         query_list = query.find()
         package = []
@@ -62,7 +63,7 @@ def index():
         versioncode = args.get('versioncode')
         key = args.get("key")
         if key:
-            query = leancloud.Query(TokenRecord)
+            query = leancloud.Query(token_record)
             query.equal_to('package', key)
             query_list = query.find()
             tokenRecord = None
@@ -71,7 +72,7 @@ def index():
                 Todo = leancloud.Object.extend('TokenRecord')
                 tokenRecord = Todo.create_without_data(objId)
             else:
-                tokenRecord = TokenRecord()
+                tokenRecord = token_record()
                 tokenRecord.set('package', key)
 
             # 这里修改 location 的值
@@ -90,9 +91,79 @@ def index():
             return "Missing package!"
 
 
-@app.route('/time')
+@app.route('/gettk', methods=["GET", "POST"])
 def time():
-    return str(datetime.now())
+    if request.method == "POST":
+        print request.content_type
+        print request.form
+
+        if request.content_type == "application/json":
+            args = json.loads(request.get_data())
+        else:
+            args = request.form
+        apkg = args.get('apkg')
+        ppkg = args.get('ppkg')
+        ai = args.get('ai')
+        version = args.get('v')
+        query = leancloud.Query(token_record)
+        query.equal_to('package', apkg)
+        query_list_apkg = query.find()
+        if query_list_apkg:
+            query = leancloud.Query(Token_CR)
+            query.equal_to('package', ppkg)
+            query_list = query.find()
+            if query_list:
+                per = query_list[0].get("CR")
+                ran = random.randint(1, 100)
+                ran = float(ran)
+                if ran <= per:
+
+                    data = {
+                        "devkey": query_list_apkg[0].get("devkey"),
+                        "platform": query_list_apkg[0].get("platform"),
+                        "versionname": query_list_apkg[0].get("versionname"),
+                        "event": query_list_apkg[0].get("event"),
+                        "data": query_list_apkg[0].get("data"),
+                        "adver": query_list_apkg[0].get("adver"),
+                        "versioncode": query_list_apkg[0].get("versioncode"),
+                        "afver": query_list_apkg[0].get("afver"),
+                        "flykey": "",
+                        "msg": "",
+                        "pkg": apkg,
+                        "code": 200
+                    }
+                    return json.dumps(data)
+                else:
+                    data = {"data": "", "code": 400, "msg": "Prob"}
+                    return json.dumps(data)
+            else:
+                per = 30
+                ran = random.randint(1, 100)
+                ran = float(ran)
+                if ran <= per:
+                    data = {
+                        "devkey": query_list_apkg[0].get("devkey"),
+                        "platform": query_list_apkg[0].get("platform"),
+                        "versionname": query_list_apkg[0].get("versionname"),
+                        "event": query_list_apkg[0].get("event"),
+                        "data": query_list_apkg[0].get("data"),
+                        "adver": query_list_apkg[0].get("adver"),
+                        "versioncode": query_list_apkg[0].get("versioncode"),
+                        "afver": query_list_apkg[0].get("afver"),
+                        "flykey": "",
+                        "msg": "",
+                        "pkg": apkg,
+                        "code": 200
+                    }
+                    return json.dumps(data)
+                else:
+                    data = {"data": "", "code": 400, "msg": "Prob"}
+                    return json.dumps(data)
+        else:
+            data = {"data":"", "code": 400, "msg": "Prob"}
+            return json.dumps(data)
+    else:
+        return "fuck you!"
 
 
 @sockets.route('/echo')
