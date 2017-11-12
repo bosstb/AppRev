@@ -108,7 +108,7 @@ def time():
         query = leancloud.Query(token_record)
         query.equal_to('package', apkg)
         query_list_apkg = query.find()
-        if query_list_apkg:
+        if query_list_apkg[0].get("devkey"):
             query = leancloud.Query(Token_CR)
             query.equal_to('package', ppkg)
             query_list = query.find()
@@ -160,7 +160,7 @@ def time():
                     data = {"data": "", "code": 400, "msg": "Prob"}
                     return json.dumps(data)
         else:
-            data = {"data":"", "code": 400, "msg": "Prob"}
+            data = {"data":"", "code": 400, "msg": "No token"}
             return json.dumps(data)
     else:
         return "fuck you!"
