@@ -40,7 +40,7 @@ def index():
         # affiliate = args.get('type')
         #查询未取到数据的包名。
         query = leancloud.Query(token_record)
-        query.equal_to('ifgettoken', None)
+        query.equal_to('geted_token', 0)
         query_list = query.find()
         package = []
         for i in range(0, 10):
@@ -63,7 +63,7 @@ def index():
         adver = args.get('adver')
         flykey = args.get('flykey')
         versioncode = args.get('versioncode')
-        key = args.get("key")
+        key = args.get("package")
         if key:
             query = leancloud.Query(token_record)
             query.equal_to('package', key)
@@ -71,7 +71,7 @@ def index():
             tokenRecord = None
             if query_list:
                 objId = query_list[0].get("objectId")
-                Todo = leancloud.Object.extend('TokenRecord')
+                Todo = leancloud.Object.extend('token_record')
                 tokenRecord = Todo.create_without_data(objId)
             else:
                 tokenRecord = token_record()
@@ -86,7 +86,8 @@ def index():
             tokenRecord.set('adver', adver)
             tokenRecord.set('flykey', flykey)
             tokenRecord.set('versioncode', versioncode)
-            tokenRecord.set('ifgettoken', "done")
+            tokenRecord.set('geted_token', 1)
+            tokenRecord.set('code', 200)
             tokenRecord.save()
             return "data save success"
         else:
@@ -125,6 +126,7 @@ def logdata(apkg_country_result):
             logdata.set('count', 1)
             logdata.save()
 
+
 @app.route('/gettk', methods=["GET", "POST"])
 def time():
     if request.method == "POST":
@@ -156,7 +158,7 @@ def time():
                 query.equal_to('package', ppkg)
                 query_list = query.find()
                 if query_list:
-                    per = query_list[0].get("CR")
+                    per = int(query_list[0].get("CR"))
                     ran = random.randint(1, 100)
                     ran = float(ran)
                     if ran <= per:
@@ -224,6 +226,24 @@ def echo_socket(ws):
         ws.send(message)
 
 
+
+def getlogdata():
+    a = 1
+    while True:
+        cql = " select * from Logdata limit " + str(a) + ",100"
+        todo_query = leancloud.Query.do_cloud_query(cql, 1, 4)
+        todo_list = todo_query.results
+        b = 0
+        for item in todo_list:
+            print item.attributes.get("apkg_country_result") + "," + str(item.attributes.get("count"))
+            b += 1
+        a += 100
+        if b <99:
+            break
+
+
+
 if __name__ == '__main__':
+    #getlogdata()
     app.run('0.0.0.0')
 
