@@ -161,6 +161,7 @@ def time():
                     per = int(query_list[0].get("CR"))
                     ran = random.randint(1, 100)
                     ran = float(ran)
+                    print str(per) + "|" + str(ran)
                     if ran <= per:
                         data = {
                             "devkey": query_list_apkg[0].get("devkey"),
