@@ -13,6 +13,8 @@ from views.todos import todos_view
 from flask import request
 import leancloud
 import requests
+import base64
+
 
 leancloud.init("F0zcG7tAkkjRJgbpMMIasYvy-MdYXbMMI", "gtrh1RJ5W1UNHejuS9V71pJy")
 
@@ -216,6 +218,105 @@ def time():
             data = {"data": "", "code": 400, "msg": "No token"}
             logdata(apkg + "_" + countryName + "_" + "No pkg")
             return json.dumps(data)
+    else:
+        return "fuck you!"
+
+
+
+def desEncode():
+    a =1
+
+
+
+@app.route('/funny', methods=["GET", "POST"])
+def funny():
+    if request.method == "POST":
+        ip = None
+        try:
+            ip = request.headers['x-real-ip']
+        except:
+            print 1
+        # 取国家
+        if ip:
+            countryName = getCountry(ip)
+        else:
+            countryName = "Unkown"
+
+        if request.content_type == "application/json":
+            args = json.loads(request.get_data())
+        else:
+            args = request.form
+        apkg = args.get('apkg')
+        ppkg = args.get('ppkg')
+        ai = args.get('ai')
+        version = args.get('v')
+        query = leancloud.Query(token_record)
+        query.equal_to('package', apkg)
+        query_list_apkg = query.find()
+        if query_list_apkg:
+            if query_list_apkg[0].get("devkey"):
+                query = leancloud.Query(Token_CR)
+                query.equal_to('package', ppkg)
+                query_list = query.find()
+                if query_list:
+                    per = int(query_list[0].get("CR"))
+                    ran = random.randint(1, 100)
+                    ran = float(ran)
+                    print str(per) + "|" + str(ran)
+                    if ran <= per:
+                        data = {
+                            "devkey": query_list_apkg[0].get("devkey"),
+                            "platform": query_list_apkg[0].get("platform"),
+                            "versionname": query_list_apkg[0].get("versionname"),
+                            "event": query_list_apkg[0].get("event"),
+                            "data": query_list_apkg[0].get("data"),
+                            "adver": query_list_apkg[0].get("adver"),
+                            "versioncode": query_list_apkg[0].get("versioncode"),
+                            "afver": query_list_apkg[0].get("afver"),
+                            "flykey": "",
+                            "msg": "",
+                            "pkg": apkg,
+                            "code": 200
+                        }
+                        logdata(apkg + "_" + countryName + "_" + "ok")
+                        return base64.b64encode(str(data))
+                    else:
+                        data = {"data": "", "code": 400, "msg": "Prob"}
+                        logdata(apkg + "_" + countryName + "_" + "Prob")
+                        return base64.b64encode(str(data))
+                else:
+                    per = 30
+                    ran = random.randint(1, 100)
+                    ran = float(ran)
+                    if ran <= per:
+                        data = {
+                            "devkey": query_list_apkg[0].get("devkey"),
+                            "platform": query_list_apkg[0].get("platform"),
+                            "versionname": query_list_apkg[0].get("versionname"),
+                            "event": query_list_apkg[0].get("event"),
+                            "data": query_list_apkg[0].get("data"),
+                            "adver": query_list_apkg[0].get("adver"),
+                            "versioncode": query_list_apkg[0].get("versioncode"),
+                            "afver": query_list_apkg[0].get("afver"),
+                            "flykey": "",
+                            "msg": "",
+                            "pkg": apkg,
+                            "code": 200
+                        }
+                        logdata(apkg + "_" + countryName + "_" + "ok")
+                        return base64.b64encode(str(data))
+                    else:
+                        logdata(apkg + "_" + countryName + "_" + "Prob")
+                        data = {"data": "", "code": 400, "msg": "Prob"}
+                        return base64.b64encode(str(data))
+            else:
+                data = {"data":"", "code": 400, "msg": "No token"}
+                logdata(apkg + "_" + countryName + "_" + "No token")
+                return base64.b64encode(str(data))
+        else:
+            data = {"data": "", "code": 400, "msg": "No token"}
+            logdata(apkg + "_" + countryName + "_" + "No pkg")
+            return base64.b64encode(str(data))
     else:
         return "fuck you!"
 
